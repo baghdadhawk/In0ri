@@ -3,7 +3,6 @@ import hashlib
 import os
 import time
 
-from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
@@ -32,7 +31,6 @@ def screenshot(url):
         driver.get_screenshot_as_file(
             "/opt/In0ri/FlaskApp/static/images/" + name.hexdigest() + ".png"
         )
-        driver.get_screenshot_as_file("/opt/In0ri/FlaskApp/static/images/" + name.hexdigest() + ".png")
         driver.quit()
     except Exception as e:
         print(e)
