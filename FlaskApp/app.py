@@ -14,12 +14,15 @@ import alert
 import createLicense as license
 import database
 import schedule as sch
+from logger import get_logger
+logger = get_logger(__name__)
 
 
 def slug(string):
     pattern = "|%[0-9]{1,}|%|--|#|;|/\*|'|\"|\\\*|\[|\]|\<|\>|xp_|\$gt|\$ne|\$lt|$"
     result = re.sub(pattern, "", string)
-    return result
+    # Strip whitespace to avoid accidental invalid tokens or chat IDs
+    return result.strip()
 
 
 al = alert.Alert()
@@ -123,7 +126,7 @@ def deleteURL():
     if check == 1:
         response = "ERROR"
     else:
-        print(url)
+        logger.info(url)
         db.remove_data(urlJson)
         sch.delete(url)
         response = "OKE"

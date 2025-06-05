@@ -14,6 +14,8 @@ import alert
 import FlaskApp.database
 from checkdefaced import check
 from screenshot import screenshot
+from logger import get_logger
+logger = get_logger(__name__)
 
 
 def slug(string):
@@ -64,10 +66,10 @@ def checkdeface():
             )
             al.sendMessage(receiver, subject, message, img_path)
             res = {"status": "Website was defaced!"}
-            print("Website was defaced!")
+            logger.info("Website was defaced!")
         else:
             res = {"status": "Everything oke!"}
-            print("Everything oke!")
+            logger.info("Everything oke!")
     return res
 
 
