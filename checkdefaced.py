@@ -4,10 +4,17 @@ from tensorflow import keras
 
 img_height = 250
 img_width = 250
-model = keras.models.load_model("/opt/In0ri/final_model.h5")
+# Lazily initialized model instance
+model = None
 
 
 def check(images_path):
+    global model
+    if model is None:
+        # Avoid expensive model loading during module import
+        model = keras.models.load_model(
+            "/opt/In0ri/final_model.h5", compile=False
+        )
     img = keras.preprocessing.image.load_img(
         images_path, target_size=(img_height, img_width)
     )
