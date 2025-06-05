@@ -6,6 +6,8 @@ from datetime import datetime
 from email.message import EmailMessage
 
 
+from logger import get_logger
+logger = get_logger(__name__)
 from telegram import Bot
 import requests
 
@@ -52,7 +54,7 @@ class Alert:
                 smtp.send_message(msg)
                 smtp.close()
         except smtplib.SMTPException as e:
-            print(e)
+            logger.exception(e)
 
     def sendBot(self, url, img_path):
         for data in db.get_multiple_data():
@@ -81,8 +83,8 @@ class Alert:
                 + "At "
                 + current_time,
             )
-        except:
-            print("Looks like CHAT_ID or TOKEN of telegram-bot was wrong!")
+        except Exception:
+            logger.error("Looks like CHAT_ID or TOKEN of telegram-bot was wrong!")
 
     def getBotInfo(self, CHAT_ID, TOKEN):
         """Validate the Telegram token and chat ID via the Bot API."""

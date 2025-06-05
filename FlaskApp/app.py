@@ -14,6 +14,8 @@ import alert
 import createLicense as license
 import database
 import schedule as sch
+from logger import get_logger
+logger = get_logger(__name__)
 
 
 def slug(string):
@@ -124,7 +126,7 @@ def deleteURL():
     if check == 1:
         response = "ERROR"
     else:
-        print(url)
+        logger.info(url)
         db.remove_data(urlJson)
         sch.delete(url)
         response = "OKE"

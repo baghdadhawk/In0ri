@@ -3,6 +3,8 @@ import re
 import time
 
 import requests
+from logger import get_logger
+logger = get_logger(__name__)
 from os import getcwd
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -20,24 +22,26 @@ def on_modified(event):
     if len(excludePath) != 0 and re.search(excludePath, event.src_path) is not None:
         return 0
     else:
-        print(f"Notification, {event.src_path} has been modified")
+        logger.info("Notification, %s has been modified", event.src_path)
         path = event.src_path
         path = path.replace(config["rootPath"], "")
         try:
             response = requests.post(
                 server, json={"key": key, "path": path}
             )
-            print(response.json())
-        except requests.ConnectionError as error:
-            print("Server not found!")
+            logger.info(response.json())
+        except requests.ConnectionError:
+            logger.error("Server not found!")
 
 
 def on_moved(event):
     if len(excludePath) != 0 and re.search(excludePath, event.src_path) is not None:
         return 0
     else:
-        print(
-            f"Notification, File {event.src_path} has been moved to {event.dest_path}"
+        logger.info(
+            "Notification, File %s has been moved to %s",
+            event.src_path,
+            event.dest_path,
         )
         path = event.dest_path
         path = path.replace(config["rootPath"], "")
@@ -45,9 +49,9 @@ def on_moved(event):
             response = requests.post(
                 server, json={"key": key, "path": path}
             )
-            print(response.json())
-        except requests.ConnectionError as error:
-            print("Server not found!")
+            logger.info(response.json())
+        except requests.ConnectionError:
+            logger.error("Server not found!")
 
 
 if __name__ == "__main__":
