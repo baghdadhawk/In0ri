@@ -3,9 +3,11 @@ from getpass import getuser
 
 
 from crontab import CronTab
+from logger import get_logger
 
 user = getuser()
 my_cron = CronTab(user=user)
+logger = get_logger(__name__)
 
 
 def create(domain, email, hours=None, minutes=None):
@@ -16,7 +18,7 @@ def create(domain, email, hours=None, minutes=None):
         if job.comment == comment:
             check = 1
     if check == 1:
-        print("This domain is avaliable!")
+        logger.info("This domain is avaliable!")
     else:
         job = my_cron.new(command=command, comment=comment)
         if hours is not None:
@@ -24,7 +26,7 @@ def create(domain, email, hours=None, minutes=None):
         if minutes is not None:
             job.minute.every(minutes)
         my_cron.write(user=user)
-        print(job.is_valid())
+        logger.info("%s", job.is_valid())
 
 
 def edit(domain, email, hours=None, minutes=None):
@@ -41,9 +43,9 @@ def edit(domain, email, hours=None, minutes=None):
             if minutes is not None:
                 job.minute.every(minutes)
             my_cron.write(user=user)
-            print("Sucessfull!")
+            logger.info("Sucessfull!")
     if check == 0:
-        print("Domain not found!")
+        logger.warning("Domain not found!")
 
 
 def delete(domain):
@@ -54,7 +56,7 @@ def delete(domain):
             check = 1
             my_cron.remove(job)
             my_cron.write(user=user)
-            print("Sucessfull!")
+            logger.info("Sucessfull!")
     if check == 0:
-        print("Domain not found!")
+        logger.warning("Domain not found!")
 

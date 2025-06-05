@@ -39,8 +39,12 @@ class Database:
         return document.acknowledged
 
     def update_empty(self, unique, data):
-        data = self.collection.update_one(unique, {"$pull": data})
-        return data
+        # Remove specified keys from the document. ``data`` should provide the
+        # fields to unset, the values are ignored by MongoDB when using
+        # ``$unset``.
+        unset_fields = {key: "" for key in data.keys()}
+        document = self.collection.update_one(unique, {"$unset": unset_fields})
+        return document.acknowledged
 
     def remove_data(self, data):
         document = self.collection.delete_one(data)

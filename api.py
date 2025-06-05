@@ -14,12 +14,15 @@ import alert
 import FlaskApp.database
 from checkdefaced import check
 from screenshot import screenshot
+from logger import get_logger
+logger = get_logger(__name__)
 
 
 def slug(string):
     pattern = "|%[0-9]{1,}|%|--|#|;|/\*|'|\"|\\\*|\[|\]|xp_|\&gt|\&ne|\&lt|&"
     result = re.sub(pattern, "", string)
-    return result
+    # Strip trailing and leading whitespace to avoid accidental issues
+    return result.strip()
 
 
 app = Flask(__name__)
@@ -64,10 +67,10 @@ def checkdeface():
             )
             al.sendMessage(receiver, subject, message, img_path)
             res = {"status": "Website was defaced!"}
-            print("Website was defaced!")
+            logger.info("Website was defaced!")
         else:
             res = {"status": "Everything oke!"}
-            print("Everything oke!")
+            logger.info("Everything oke!")
     return res
 
 
