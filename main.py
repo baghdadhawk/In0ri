@@ -6,7 +6,10 @@ from logger import get_logger
 logger = get_logger(__name__)
 from screenshot import screenshot
 
-script, url, receiver = argv
+script, url, receiver, *rest = argv
+notify_clean = False
+if rest:
+    notify_clean = bool(int(rest[0]))
 
 
 def main(url, receiver):
@@ -26,6 +29,9 @@ def main(url, receiver):
         logger.info("Website was defaced!")
     else:
         logger.info("Everything oke!")
+        if notify_clean:
+            al.sendBot(url, img_path)
+            al.sendMessage(receiver, "All Good!", "Website looks fine.")
 
 
 main(url, receiver)

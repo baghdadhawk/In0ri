@@ -58,7 +58,7 @@ function initTableData() {
 									<td><span id="smtp_address"></span></td>
 									</td>
 									<td>
-									<button type="button" title="Edit" class="btn btn-rounded btn-outline-primary"><i class="fa fa-pencil color-muted" aria-hidden="true" data-toggle="modal" data-target="#ModalAddSMTP"></i></button> <button onclick="deletesmtp();" type="button" title="Delete" class="btn btn-rounded btn-outline-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                                                        <button type="button" title="Edit" class="btn btn-rounded btn-outline-primary" data-toggle="modal" data-target="#ModalAddSMTP"><i class="fa fa-pencil color-muted" aria-hidden="true"></i></button> <button onclick="deletesmtp();" type="button" title="Delete" class="btn btn-rounded btn-outline-danger"><i class="fa fa-trash" aria-hidden="true"></i></button> <button onclick="testSMTP();" type="button" title="Test" class="btn btn-rounded btn-outline-success"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
 									</td>
 								</tr>
 							</tbody>
@@ -108,7 +108,7 @@ function initTableData() {
 									<td><span id="first_name"></span></td>
 									</td>
 									<td>
-									<button type="button" title="Edit" class="btn btn-rounded btn-outline-primary" data-toggle="modal" data-target="#ModalAddBOT"><i class="fa fa-pencil color-muted" aria-hidden="true"></i></button> <button onclick="deletetelegram();" type="button" title="Delete" class="btn btn-rounded btn-outline-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                                                        <button type="button" title="Edit" class="btn btn-rounded btn-outline-primary" data-toggle="modal" data-target="#ModalAddBOT"><i class="fa fa-pencil color-muted" aria-hidden="true"></i></button> <button onclick="deletetelegram();" type="button" title="Delete" class="btn btn-rounded btn-outline-danger"><i class="fa fa-trash" aria-hidden="true"></i></button> <button onclick="testTelegram();" type="button" title="Test" class="btn btn-rounded btn-outline-success"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
 									</td>
 								</tr>
 							</tbody>
@@ -172,6 +172,40 @@ function deletetelegram() {
 			console.log(error);
 		}
 	});
+}
+
+function testSMTP() {
+        $.ajax({
+                url: '/testEmail',
+                type: 'POST',
+                success: function(res) {
+                        if(res == "OKE"){
+                                alert("Test email sent!");
+                        }else{
+                                alert("Test email failed!");
+                        }
+                },
+                error: function(error) {
+                        console.log(error);
+                }
+        });
+}
+
+function testTelegram() {
+        $.ajax({
+                url: '/testTelegram',
+                type: 'POST',
+                success: function(res) {
+                        if(res == "OKE"){
+                                alert("Test telegram sent!");
+                        }else{
+                                alert("Test telegram failed!");
+                        }
+                },
+                error: function(error) {
+                        console.log(error);
+                }
+        });
 }
 
 

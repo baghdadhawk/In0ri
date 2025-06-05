@@ -4,6 +4,7 @@ import smtplib
 import sys
 from datetime import datetime
 from email.message import EmailMessage
+import ssl
 
 
 from logger import get_logger
@@ -40,7 +41,7 @@ class Alert:
         msg["To"] = receiver
         msg.set_content(message)
 
-        try: 
+        try:
             if imagePath is not None:
                 with open(imagePath, "rb") as f:
                     file_data = f.read()
@@ -49,12 +50,43 @@ class Alert:
                     file_data, maintype="image", subtype=file_type, filename="Website image"
                 )
 
-            with smtplib.SMTP_SSL(EMAIL_SERVER, 465) as smtp:
-                smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-                smtp.send_message(msg)
-                smtp.close()
+            # Create SSL context
+            context = ssl.create_default_context()
+
+            # Try multiple connection methods
+            try:
+                # Method 1: SMTP_SSL (port 465)
+                with smtplib.SMTP_SSL(EMAIL_SERVER, 465, context=context) as smtp:
+                    smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+                    smtp.send_message(msg)
+                    logger.info("Email sent successfully via SMTP_SSL")
+            except Exception as e1:
+                logger.warning(f"SMTP_SSL failed: {e1}")
+                try:
+                    # Method 2: SMTP with STARTTLS (port 587)
+                    with smtplib.SMTP(EMAIL_SERVER, 587) as smtp:
+                        smtp.starttls(context=context)
+                        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+                        smtp.send_message(msg)
+                        logger.info("Email sent successfully via SMTP with STARTTLS")
+                except Exception as e2:
+                    logger.warning(f"SMTP with STARTTLS failed: {e2}")
+                    # Method 3: SMTP with less secure SSL context
+                    context_insecure = ssl.create_default_context()
+                    context_insecure.check_hostname = False
+                    context_insecure.verify_mode = ssl.CERT_NONE
+
+                    with smtplib.SMTP_SSL(EMAIL_SERVER, 465, context=context_insecure) as smtp:
+                        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+                        smtp.send_message(msg)
+                        logger.info("Email sent successfully via insecure SSL context")
+
         except smtplib.SMTPException as e:
-            logger.exception(e)
+            logger.exception(f"SMTP Error: {e}")
+            raise
+        except Exception as e:
+            logger.exception(f"General Error: {e}")
+            raise
 
     def sendBot(self, url, img_path):
         for data in db.get_multiple_data():

@@ -61,7 +61,9 @@ def register():
     email = slug(request.form["email"])
     hours = slug(request.form["hours"])
     minutes = slug(request.form["minutes"])
+    notify_clean = slug(request.form.get("notify_clean", ""))
     int_format = re.compile("^[0-9]+$")
+    notify_flag = True if notify_clean == "on" else False
 
     if len(url) == 0 or len(email) == 0 or len(hours) == 0 or len(minutes) == 0:
         return "Null"
@@ -74,7 +76,13 @@ def register():
 
     db = database.Database("site")
     time = f"{int(hours)} hours {int(minutes)} minutes"
-    data = {"email": email, "time": time, "active_key": "", "url": url}
+    data = {
+        "email": email,
+        "time": time,
+        "active_key": "",
+        "url": url,
+        "notify_clean": notify_flag,
+    }
     check = 0
     for check in db.get_multiple_data():
         if check["url"] == url:
@@ -84,9 +92,9 @@ def register():
     else:
         db.insert_data(data)
         if int(hours) == 0:
-            sch.create(url, email, None, minutes)
+            sch.create(url, email, notify_flag, None, minutes)
         if int(minutes) == 0:
-            sch.create(url, email, hours, None)
+            sch.create(url, email, notify_flag, hours, None)
         response = "OKE"
     return response
 
@@ -247,6 +255,33 @@ def deleteSetting():
         else:
             response = "Bad data!"
     return response
+
+
+@app.route("/testEmail", methods=["POST"])
+def testEmail():
+    receiver = slug(request.form.get("email", ""))
+    if len(receiver) == 0:
+        # fall back to stored smtp address
+        dbs = database.Database("setting")
+        for data in dbs.get_multiple_data():
+            if "smtp" in data and data["smtp"]:
+                receiver = data["smtp"][0]["smtp_address"]
+    subject = "Test Email"
+    message = "This is a test email from In0ri"
+    try:
+        al.sendMessage(receiver, subject, message)
+        return "OKE"
+    except Exception:
+        return "ERROR"
+
+
+@app.route("/testTelegram", methods=["POST"])
+def testTelegram():
+    try:
+        al.sendBot("Test", "/opt/In0ri/img/logo.png")
+        return "OKE"
+    except Exception:
+        return "ERROR"
 
 
 if __name__ == "__main__":
