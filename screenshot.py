@@ -37,7 +37,6 @@ def screenshot(url):
         driver.get_screenshot_as_file(
             "/opt/In0ri/FlaskApp/static/images/" + name.hexdigest() + ".png"
         )
-        driver.quit()
 
     except Exception as e:
         logger.exception(e)

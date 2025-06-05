@@ -10,8 +10,8 @@ my_cron = CronTab(user=user)
 logger = get_logger(__name__)
 
 
-def create(domain, email, hours=None, minutes=None):
-    command = f"python3 /opt/In0ri/main.py {domain} {email}"
+def create(domain, email, notify, hours=None, minutes=None):
+    command = f"python3 /opt/In0ri/main.py {domain} {email} {int(notify)}"
     comment = md5(domain.encode()).hexdigest()
     check = 0
     for job in my_cron:
@@ -29,8 +29,8 @@ def create(domain, email, hours=None, minutes=None):
         logger.info("%s", job.is_valid())
 
 
-def edit(domain, email, hours=None, minutes=None):
-    command = f"python3 /opt/In0ri/main.py {domain} {email}"
+def edit(domain, email, notify, hours=None, minutes=None):
+    command = f"python3 /opt/In0ri/main.py {domain} {email} {int(notify)}"
     comment = md5(domain.encode()).hexdigest()
     check = 0
     for job in my_cron:

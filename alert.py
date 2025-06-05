@@ -40,7 +40,7 @@ class Alert:
         msg["To"] = receiver
         msg.set_content(message)
 
-        try: 
+        try:
             if imagePath is not None:
                 with open(imagePath, "rb") as f:
                     file_data = f.read()
@@ -51,7 +51,6 @@ class Alert:
 
             # Create SSL context
             context = ssl.create_default_context()
-            
             # Try multiple connection methods
             try:
                 # Method 1: SMTP_SSL (port 465)
@@ -74,7 +73,6 @@ class Alert:
                     context_insecure = ssl.create_default_context()
                     context_insecure.check_hostname = False
                     context_insecure.verify_mode = ssl.CERT_NONE
-                    
                     with smtplib.SMTP_SSL(EMAIL_SERVER, 465, context=context_insecure) as smtp:
                         smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
                         smtp.send_message(msg)
