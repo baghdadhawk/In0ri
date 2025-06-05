@@ -23,6 +23,7 @@ RUN apt install -y \
 && pip install flask \  
 && pip install pymongo \
 && pip install python-crontab \
+&& pip install cffi \
 && pip install pyOpenSSL
 
 # Add geckodriver
