@@ -13,6 +13,9 @@ def main(url, receiver):
     al = alert.Alert()
     logger.info(url)
     img_path = screenshot(url)
+    if img_path is None:
+        logger.error("Failed to capture screenshot for %s", url)
+        return
 
     defaced = check(img_path)
     if defaced:
@@ -21,7 +24,8 @@ def main(url, receiver):
         message = f"You website was defaced!\nURL: {url}"
         al.sendMessage(receiver, subject, message, img_path)
         logger.info("Website was defaced!")
-    logger.info("Everything oke!")
+    else:
+        logger.info("Everything oke!")
 
 
 main(url, receiver)

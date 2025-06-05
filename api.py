@@ -58,6 +58,9 @@ def checkdeface():
         res = {"status": "URL Invalid! " + url}
     else:
         img_path = screenshot(url)
+        if img_path is None:
+            logger.error("Failed to capture screenshot for %s", url)
+            return {"status": "500 Internal Server Error!"}
         defaced = check(img_path)
         if defaced:
             al.sendBot(url, img_path)

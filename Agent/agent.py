@@ -4,18 +4,18 @@ import time
 
 import requests
 from logger import get_logger
+from os import path as osp
+
 logger = get_logger(__name__)
-from os import getcwd
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 
-path = getcwd()
-f = open(f"{path}/config.json", "r")
-config = json.load(f)
+base_dir = osp.dirname(osp.abspath(__file__))
+with open(osp.join(base_dir, "config.json"), "r") as f:
+    config = json.load(f)
 key = config["key"]
 excludePath = config["excludePath"]
 server = config["apiServer"]
-f.close()
 
 
 def on_modified(event):
