@@ -3,15 +3,19 @@ import hashlib
 import os
 import time
 
-from PIL import Image
+from logger import get_logger
+logger = get_logger(__name__)
+
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.firefox import GeckoDriverManager
+
 
 if not os.path.exists("/opt/In0ri/FlaskApp/static/images/"):
     os.makedirs("/opt/In0ri/FlaskApp/static/images/")
 
-firefox_path=GeckoDriverManager().install()
+# Use the geckodriver installed with the Docker image. This avoids
+# downloading the driver at runtime which would fail without network
+# access and slows startup.
+firefox_path = os.environ.get("GECKODRIVER_PATH", "/usr/bin/geckodriver")
 
 
 def screenshot(url):
@@ -27,16 +31,16 @@ def screenshot(url):
     name = hashlib.md5(url.encode())
     try:
         driver.get(url)
-        print("Screenshoting..." + url)
+        logger.info("Screenshoting...%s", url)
         time.sleep(6)
         driver.get_screenshot_as_file(
             "/opt/In0ri/FlaskApp/static/images/" + name.hexdigest() + ".png"
         )
-        driver.get_screenshot_as_file("/opt/In0ri/FlaskApp/static/images/" + name.hexdigest() + ".png")
-        driver.quit()
     except Exception as e:
-        print(e)
-        print("URL " + url + " was died!")
-        pass
+        logger.exception(e)
+        logger.error("URL %s was died!", url)
+        return None
+    finally:
+        driver.quit()
 
     return "/opt/In0ri/FlaskApp/static/images/" + name.hexdigest() + ".png"

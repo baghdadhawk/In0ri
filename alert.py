@@ -6,7 +6,10 @@ from datetime import datetime
 from email.message import EmailMessage
 
 
+from logger import get_logger
+logger = get_logger(__name__)
 from telegram import Bot
+import requests
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -51,7 +54,7 @@ class Alert:
                 smtp.send_message(msg)
                 smtp.close()
         except smtplib.SMTPException as e:
-            print(e)
+            logger.exception(e)
 
     def sendBot(self, url, img_path):
         for data in db.get_multiple_data():
@@ -80,16 +83,29 @@ class Alert:
                 + "At "
                 + current_time,
             )
-        except:
-            print("Looks like CHAT_ID or TOKEN of telegram-bot was wrong!")
+        except Exception:
+            logger.error("Looks like CHAT_ID or TOKEN of telegram-bot was wrong!")
 
     def getBotInfo(self, CHAT_ID, TOKEN):
+        """Validate the Telegram token and chat ID via the Bot API."""
         try:
-            bot1 = Bot(TOKEN)
-            first_name = bot1.getMe().first_name
-            title = bot1.getChat(CHAT_ID).title
+            me_resp = requests.get(
+                f"https://api.telegram.org/bot{TOKEN}/getMe", timeout=5
+            ).json()
+            if not me_resp.get("ok"):
+                return "ERROR"
+            first_name = me_resp.get("result", {}).get("first_name", "")
+
+            chat_resp = requests.get(
+                f"https://api.telegram.org/bot{TOKEN}/getChat",
+                params={"chat_id": CHAT_ID},
+                timeout=5,
+            ).json()
+            if not chat_resp.get("ok"):
+                return "ERROR"
+            title = chat_resp.get("result", {}).get("title", "")
             return first_name, title
-        except:
+        except Exception:
             return "ERROR"
 
 
